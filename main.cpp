@@ -16,12 +16,13 @@ const int recWidth = 5;
 const int recHeight = 5;
 int numR = screenHeight / recHeight;
 int numC = screenWidth / recWidth;
+bool isSand = true;
 
 int main() {
     cells.resize(numR, vector<Cell>(numC));
     for(int i = 0; i < numR; i++) {
         for(int j = 0; j < numC; j++) {
-            cells[i][j] = Cell(j * recWidth, i * recHeight, recWidth, recHeight, true, false);
+            cells[i][j] = Cell(j * recWidth, i * recHeight, recWidth, recHeight, false, EMPTY);
         }
     }
 
@@ -31,8 +32,6 @@ int main() {
     while(!WindowShouldClose()) {
         Update();
         BeginDrawing();
-        float fps = GetFPS();
-        cout << fps << "\n";
         ClearBackground(BLACK);
         Draw();
         EndDrawing();
@@ -51,24 +50,50 @@ void Draw() {
 }
 
 void Update(){
+    if(IsKeyPressed(KEY_ENTER)){
+        isSand = !isSand;
+    }
     for(int i = numR - 1; i >= 0; i--){
         for(int j = numC - 1; j >= 0; j--){
-            cells[i][j].empty = cells[i][j].isClicked() ? false : cells[i][j].empty;
-            cells[i][j].updated = !cells[i][j].updated;
-            if(i < numR - 1){
-                if(!cells[i][j].empty && cells[i+1][j].empty){
-                    switchCells(cells[i][j], cells[i+1][j]);
-                } else if(j < numC - 1 && cells[i+1][j+1].empty){
-                    switchCells(cells[i][j], cells[i+1][j+1]);
-                } else if(j > 0 && cells[i+1][j-1].empty) {
-                    switchCells(cells[i][j], cells[i+1][j-1]);
+            cells[i][j].updated = false;
+            if(cells[i][j].isClicked()){
+                if(isSand){
+                    cells[i][j].particleType = SAND;
+                } else {
+                    cells[i][j].particleType = WATER;
                 }
+            }
+            if(cells[i][j].particleType == SAND){
+                if(i < cells.size() - 1){
+                    if(cells[i+1][j].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i+1][j]);
+                    } else if(j < cells[0].size() - 1 && cells[i+1][j+1].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i+1][j+1]);
+                    } else if(j > 0 && cells[i+1][j-1].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i+1][j-1]);
+                    }
+                }
+            } 
+            else if(cells[i][j].particleType == WATER && cells[i][j].updated == false){
+                if(i < cells.size() - 1){
+                    if(cells[i+1][j].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i+1][j]);
+                    } else if(j < cells[0].size() - 1 && cells[i+1][j+1].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i+1][j+1]);
+                    } else if(j > 0 && cells[i+1][j-1].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i+1][j-1]);
+                    } else if(j < cells[0].size() - 1 && cells[i][j+1].particleType == EMPTY){
+                        switchCells(cells[i][j], cells[i][j+1]);
+                    }
+                }
+                cells[i][j].updated = true;
+                
             }
         }
     }
 }
 
 void switchCells(Cell &c1, Cell &c2){
-    swap(c1.empty, c2.empty);
+    swap(c1.particleType, c2.particleType);
     c1.updated = true; c2.updated = true;
 }
