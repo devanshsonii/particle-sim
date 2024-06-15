@@ -1,13 +1,13 @@
 #include <iostream>
 #include "raylib.h"
 #include "grid.h"
+#include "particle.h"
 #include <vector>
 
 using namespace std;
 
 void Draw();
 void Update();
-void switchCells(Cell &c1, Cell &c2);
 
 vector<vector<Cell>> cells;
 const int screenHeight = 800;
@@ -31,8 +31,6 @@ int main() {
     while(!WindowShouldClose()) {
         Update();
         BeginDrawing();
-        float fps = GetFPS();
-        cout << fps << "\n";
         ClearBackground(BLACK);
         Draw();
         EndDrawing();
@@ -53,22 +51,26 @@ void Draw() {
 void Update(){
     for(int i = numR - 1; i >= 0; i--){
         for(int j = numC - 1; j >= 0; j--){
-            cells[i][j].empty = cells[i][j].isClicked() ? false : cells[i][j].empty;
+            if(cells[i][j].isClicked()){
+                cells[i][j].empty = false;
+                cells[i][j].particleType = ParticleType::Water; // Set the particle type on click
+            }
             cells[i][j].updated = !cells[i][j].updated;
-            if(i < numR - 1){
-                if(!cells[i][j].empty && cells[i+1][j].empty){
-                    switchCells(cells[i][j], cells[i+1][j]);
-                } else if(j < numC - 1 && cells[i+1][j+1].empty){
-                    switchCells(cells[i][j], cells[i+1][j+1]);
-                } else if(j > 0 && cells[i+1][j-1].empty) {
-                    switchCells(cells[i][j], cells[i+1][j-1]);
+            if(!cells[i][j].empty){
+                unique_ptr<Particle> particle;
+                switch(cells[i][j].particleType){
+                    case ParticleType::Sand:
+                        particle = make_unique<SandParticle>();
+                        break;
+                    case ParticleType::Water:
+                        particle = make_unique<WaterParticle>();
+                        break;
+                    default:
+                        continue; // Skip if no matching particle type
                 }
+                particle->Update(cells, i, j);
             }
         }
     }
 }
 
-void switchCells(Cell &c1, Cell &c2){
-    swap(c1.empty, c2.empty);
-    c1.updated = true; c2.updated = true;
-}

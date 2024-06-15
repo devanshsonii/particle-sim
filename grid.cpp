@@ -3,11 +3,22 @@
 
 // Constructor definition
 Cell::Cell(int x, int y, int width, int height, bool empty, bool updated)
-    : x(x), y(y), width(width), height(height), empty(empty), updated(updated) {}
+    : x(x), y(y), width(width), height(height), updated(updated), empty(empty) {}
 
 void Cell::Draw() {
-    Color color = empty ? BLACK : WHITE;
-    DrawRectangle(x, y, width, height, color);
+    Color drawColor = this->empty ? BLACK : this->color; // Default to black if empty, otherwise use the cell's color
+    switch(particleType){
+        case ParticleType::None:
+            drawColor = BLACK; // Or any color representing an empty cell
+            break;
+        case ParticleType::Sand:
+            drawColor = BROWN;
+            break;
+        case ParticleType::Water:
+            drawColor = BLUE;
+            break;
+    }
+    DrawRectangle(x, y, width, height, drawColor);
 }
 
 void Cell::Update(Cell& below) {
