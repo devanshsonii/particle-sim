@@ -21,9 +21,6 @@ void Cell::Draw() {
     DrawRectangle(x, y, width, height, drawColor);
 }
 
-void Cell::Update(Cell& below) {
-    
-}
 
 bool Cell::isClicked(){
     Vector2 mousePos = GetMousePosition();

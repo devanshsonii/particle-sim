@@ -29,8 +29,8 @@ int main() {
     SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
-        Update();
         BeginDrawing();
+        Update();
         ClearBackground(BLACK);
         Draw();
         EndDrawing();
@@ -42,7 +42,7 @@ int main() {
 
 void Draw() {
     for(auto &row : cells) {
-        for(Cell &cell : row) {
+        for(auto &cell : row) {
             cell.Draw();
         }
     }
