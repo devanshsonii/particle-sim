@@ -3,7 +3,6 @@
 #include "grid.h"
 #include "particle.h"
 #include <vector>
-
 using namespace std;
 
 void Draw();
