@@ -1,7 +1,9 @@
 #include <iostream>
 #include "raylib.h"
 #include "grid.h"
+#include "particle.h"
 #include <vector>
+#include <memory>
 #include <random>
 
 using namespace std;
@@ -18,6 +20,18 @@ const int recHeight = 5;
 int numR = screenHeight / recHeight;
 int numC = screenWidth / recWidth;
 bool isSand = true;
+
+
+std::unique_ptr<Particle> getParticle(ParticleType type) {
+    switch (type) {
+        case SAND:
+            return std::make_unique<SandParticle>();
+        case WATER:
+            return std::make_unique<WaterParticle>();
+        default:
+            return nullptr;
+    }
+}
 
 int main() {
     cells.resize(numR, vector<Cell>(numC));
@@ -49,55 +63,24 @@ void Draw() {
         }
     }
 }
-void Update(){
-    std::random_device rd; // Non-deterministic generator
-    std::mt19937 gen(rd()); // To seed mersenne twister.
-    std::uniform_int_distribution<> distrib(0, 1); // Define range
 
 
-    if(IsKeyPressed(KEY_ENTER)){
+void Update() {
+    if (IsKeyPressed(KEY_ENTER)) {
         isSand = !isSand;
     }
 
-    for(int i = numR - 1; i >= 0; i--){
-        for(int j = numC - 1; j >= 0; j--){
+    for (int i = numR - 1; i >= 0; i--) {
+        for (int j = numC - 1; j >= 0; j--) {
             cells[i][j].updated = false;
-            if(cells[i][j].isClicked()){
-                if(isSand){
-                    cells[i][j].particleType = SAND;
-                } else {
-                    cells[i][j].particleType = WATER;
-                }
+            if (cells[i][j].isClicked()) {
+                cells[i][j].particleType = isSand ? SAND : WATER;
             }
-            if(cells[i][j].particleType == SAND){
-                if(i < cells.size() - 1){
-                    if(cells[i+1][j].particleType == EMPTY){
-                        switchCells(cells[i][j], cells[i+1][j]);
-                    } else if(j < cells[0].size() - 1 && cells[i+1][j+1].particleType == EMPTY){
-                        switchCells(cells[i][j], cells[i+1][j+1]);
-                    } else if(j > 0 && cells[i+1][j-1].particleType == EMPTY){
-                        switchCells(cells[i][j], cells[i+1][j-1]);
-                    }
-                }
-            } 
-            if(cells[i][j].particleType == WATER && cells[i][j].updated == false){
-                if(i < cells.size() - 1 && cells[i+1][j].particleType == EMPTY){
-                    switchCells(cells[i][j], cells[i+1][j]);
-                } else {
-                    bool moveLeft = distrib(gen) == 0; // Randomly choose left or right
-                    if(moveLeft && j > 0 && cells[i][j-1].particleType == EMPTY){
-                        switchCells(cells[i][j], cells[i][j-1]);
-                    } else if(!moveLeft && j < cells[0].size() - 1 && cells[i][j+1].particleType == EMPTY){
-                        switchCells(cells[i][j], cells[i][j+1]);
-                    }
-                }
-                cells[i][j].updated = true;
+            
+            auto particle = getParticle(cells[i][j].particleType);
+            if (particle && !cells[i][j].updated) {
+                particle->update(cells, i, j);
             }
         }
     }
-}
-
-void switchCells(Cell &c1, Cell &c2){
-    swap(c1.particleType, c2.particleType);
-    c1.updated = true; c2.updated = true;
 }

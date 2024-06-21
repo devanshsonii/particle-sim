@@ -4,7 +4,7 @@
 CXX = g++
 
 # Source file
-SOURCE = main.cpp grid.cpp 
+SOURCE = main.cpp grid.cpp particle.cpp
 
 # Output file
 OUTPUT = myprogram
