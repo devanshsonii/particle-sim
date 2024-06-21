@@ -6,10 +6,10 @@ Cell::Cell(int x, int y, int width, int height, bool empty, bool updated)
     : x(x), y(y), width(width), height(height), updated(updated), empty(empty) {}
 
 void Cell::Draw() {
-    Color drawColor = this->empty ? BLACK : this->color; // Default to black if empty, otherwise use the cell's color
+    Color drawColor = this->empty ? BLACK : this->color; 
     switch(particleType){
         case ParticleType::None:
-            drawColor = BLACK; // Or any color representing an empty cell
+            drawColor = BLACK; 
             break;
         case ParticleType::Sand:
             drawColor = BROWN;
