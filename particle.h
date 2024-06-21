@@ -1,6 +1,6 @@
 #pragma once
-#include <vector> // Ensure vector is included
-#include "grid.h" // Assuming grid.h has the definition of Cell
+#include <vector> 
+#include "grid.h" 
 
 class Particle {
 public:

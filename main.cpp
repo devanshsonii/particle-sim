@@ -52,7 +52,7 @@ void Update(){
         for(int j = numC - 1; j >= 0; j--){
             if(cells[i][j].isClicked()){
                 cells[i][j].empty = false;
-                cells[i][j].particleType = ParticleType::Water; // Set the particle type on click
+                cells[i][j].particleType = ParticleType::Water; 
             }
             cells[i][j].updated = !cells[i][j].updated;
             if(!cells[i][j].empty){
@@ -65,7 +65,7 @@ void Update(){
                         particle = make_unique<WaterParticle>();
                         break;
                     default:
-                        continue; // Skip if no matching particle type
+                        continue; 
                 }
                 particle->Update(cells, i, j);
             }

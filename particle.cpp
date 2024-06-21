@@ -1,5 +1,5 @@
 #include "particle.h"
-#include "grid.h" // Assuming this includes the definition of switchCells
+#include "grid.h" 
 #include <iostream>
 
 
@@ -31,19 +31,15 @@ void SandParticle::Update(std::vector<std::vector<Cell>>& cells, int i, int j) {
 
 
 void WaterParticle::Update(std::vector<std::vector<Cell>>& cells, int i, int j) {
-    std::cout << "Updating WaterParticle at position: " << i << ", " << j << std::endl;
     if (i < cells.size() - 1 && cells[i + 1][j].empty) {
-        std::cout << "Moving down" << std::endl;
         switchCells(cells[i][j], cells[i + 1][j]);
     } else {
         bool moved = false;
         if (j < cells[0].size() - 1 && cells[i][j + 1].empty) {
-            std::cout << "Moving right" << std::endl;
             switchCells(cells[i][j], cells[i][j + 1]);
             moved = true;
         }
         if (!moved && j > 0 && cells[i][j - 1].empty) {
-            std::cout << "Moving left" << std::endl;
             switchCells(cells[i][j], cells[i][j - 1]);
         }
     }
