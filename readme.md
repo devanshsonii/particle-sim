@@ -1,6 +1,6 @@
 # 2D Sandbox Simulation
 
-![Showcase]([https://imgur.com/a/rmvpV5d](https://imgur.com/gallery/simulation-rmvpV5d))
+![Showcase](https://imgur.com/cQ6A2V3)
 
 
 ## Project Overview
