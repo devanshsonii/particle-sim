@@ -1,11 +1,14 @@
 #ifndef GRID_H
 #define GRID_H
+
 #include "raylib.h"
+#include <vector>
 
 enum ParticleType {
-    None,
-    Sand,
-    Water
+    SAND,
+    WATER,
+    WALL,
+    EMPTY
 };
 
 class Cell {
@@ -14,16 +17,16 @@ public:
     int y;
     int width;
     int height;
-    ParticleType particleType;
     bool updated;
-    bool empty;
+    ParticleType particleType;
     Color color;
     Cell() : x(0), y(0), width(0), height(0), color(BLACK), updated(false) {} // Default constructor
 
-    Cell(int x, int y, int width, int height, bool empty, bool updated);
+    Cell(int x, int y, int width, int height, bool updated, ParticleType particleType);
     void Draw();
-    void Update(Cell& below);
+    void Update(std::vector<std::vector<Cell>> &cells);
     bool isClicked();
+
 
 };
 

@@ -1,26 +1,34 @@
 #include "grid.h"
 #include <algorithm>
+#include <vector>
 
 // Constructor definition
-Cell::Cell(int x, int y, int width, int height, bool empty, bool updated)
-    : x(x), y(y), width(width), height(height), updated(updated), empty(empty) {}
+Cell::Cell(int x, int y, int width, int height, bool updated, ParticleType particleType)
+    : x(x), y(y), width(width), height(height), updated(updated), particleType(particleType) {}
 
 void Cell::Draw() {
-    Color drawColor = this->empty ? BLACK : this->color; 
-    switch(particleType){
-        case ParticleType::None:
-            drawColor = BLACK; 
+    // Color color = empty ? BLACK : WHITE;
+    Color color;
+    switch (particleType) {
+        case SAND:
+            color = YELLOW;
             break;
-        case ParticleType::Sand:
-            drawColor = BROWN;
+        case WATER:
+            color = BLUE;
             break;
-        case ParticleType::Water:
-            drawColor = BLUE;
+        case WALL:
+            color = GRAY;
+            break;
+        case EMPTY:
+            color = BLACK;
             break;
     }
-    DrawRectangle(x, y, width, height, drawColor);
+    DrawRectangle(x, y, width, height, color);
 }
 
+void Cell::Update(std::vector<std::vector<Cell>> &cells) {
+
+}
 
 bool Cell::isClicked(){
     Vector2 mousePos = GetMousePosition();

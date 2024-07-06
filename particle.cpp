@@ -1,48 +1,46 @@
 #include "particle.h"
-#include "grid.h" 
-#include <iostream>
+#include <random>
+#include <algorithm>
+using namespace std;
 
+Particle::Particle() : gen(random_device()()), distrib(0, 1) {}
 
-void switchCells(Cell &c1, Cell &c2){
-    std::swap(c1.x, c2.x);
-    std::swap(c1.y, c2.y);
-    std::swap(c1.width, c2.width);
-    std::swap(c1.height, c2.height);
-    std::swap(c1.particleType, c2.particleType);
-    std::swap(c1.updated, c2.updated);
-    std::swap(c1.empty, c2.empty);
-    std::swap(c1.color, c2.color);
-
+void Particle::switchCells(Cell& c1, Cell& c2) {
+    swap(c1.particleType, c2.particleType);
     c1.updated = true;
     c2.updated = true;
 }
 
-void SandParticle::Update(std::vector<std::vector<Cell>>& cells, int i, int j) {
-    if(i < cells.size() - 1){
-        if(!cells[i][j].empty && cells[i+1][j].empty){
+void SandParticle::update(vector<vector<Cell>>& cells, int i, int j) {
+    int numR = cells.size();
+    int numC = cells[0].size();
+
+    if (i < numR - 1) {
+        if (cells[i+1][j].particleType == EMPTY) {
             switchCells(cells[i][j], cells[i+1][j]);
-        } else if(j < cells[0].size() - 1 && cells[i+1][j+1].empty){
+        } else if (j < numC - 1 && cells[i+1][j+1].particleType == EMPTY) {
             switchCells(cells[i][j], cells[i+1][j+1]);
-        } else if(j > 0 && cells[i+1][j-1].empty) {
+        } else if (j > 0 && cells[i+1][j-1].particleType == EMPTY) {
             switchCells(cells[i][j], cells[i+1][j-1]);
+        } else if (cells[i+1][j].particleType == WATER) {
+            switchCells(cells[i][j], cells[i+1][j]);
         }
     }
 }
 
+void WaterParticle::update(std::vector<std::vector<Cell>>& cells, int i, int j) {
+    int numR = cells.size();
+    int numC = cells[0].size();
 
-void WaterParticle::Update(std::vector<std::vector<Cell>>& cells, int i, int j) {
-    if (i < cells.size() - 1 && cells[i + 1][j].empty) {
-        switchCells(cells[i][j], cells[i + 1][j]);
+    // Move down
+    if (i < numR - 1 && cells[i+1][j].particleType == EMPTY) {
+        switchCells(cells[i][j], cells[i+1][j]);
     } else {
-        bool moved = false;
-        if (j < cells[0].size() - 1 && cells[i][j + 1].empty) {
-            switchCells(cells[i][j], cells[i][j + 1]);
-            moved = true;
-        }
-        if (!moved && j > 0 && cells[i][j - 1].empty) {
-            switchCells(cells[i][j], cells[i][j - 1]);
+        bool moveLeft = distrib(gen) == 0;
+        if (moveLeft && j > 0 && cells[i][j-1].particleType == EMPTY) {
+            switchCells(cells[i][j], cells[i][j-1]);
+        } else if (!moveLeft && j < numC - 1 && cells[i][j+1].particleType == EMPTY) {
+            switchCells(cells[i][j], cells[i][j+1]);
         }
     }
 }
-
-

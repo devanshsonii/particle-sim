@@ -3,6 +3,9 @@
 #include "grid.h"
 #include "particle.h"
 #include <vector>
+#include <memory>
+#include <random>
+
 using namespace std;
 
 void Draw();
@@ -15,12 +18,25 @@ const int recWidth = 5;
 const int recHeight = 5;
 int numR = screenHeight / recHeight;
 int numC = screenWidth / recWidth;
+bool isSand = true;
+
+
+std::unique_ptr<Particle> getParticle(ParticleType type) {
+    switch (type) {
+        case SAND:
+            return std::make_unique<SandParticle>();
+        case WATER:
+            return std::make_unique<WaterParticle>();
+        default:
+            return nullptr;
+    }
+}
 
 int main() {
     cells.resize(numR, vector<Cell>(numC));
     for(int i = 0; i < numR; i++) {
         for(int j = 0; j < numC; j++) {
-            cells[i][j] = Cell(j * recWidth, i * recHeight, recWidth, recHeight, true, false);
+            cells[i][j] = Cell(j * recWidth, i * recHeight, recWidth, recHeight, false, EMPTY);
         }
     }
 
@@ -28,10 +44,11 @@ int main() {
     SetTargetFPS(60);
 
     while(!WindowShouldClose()) {
-        BeginDrawing();
         Update();
+        BeginDrawing();
         ClearBackground(BLACK);
         Draw();
+        DrawText("Press ENTER to switch between SAND and WATER.", 100, 100, 24, WHITE);
         EndDrawing();
     }
 
@@ -41,35 +58,29 @@ int main() {
 
 void Draw() {
     for(auto &row : cells) {
-        for(auto &cell : row) {
+        for(Cell &cell : row) {
             cell.Draw();
         }
     }
 }
 
-void Update(){
-    for(int i = numR - 1; i >= 0; i--){
-        for(int j = numC - 1; j >= 0; j--){
-            if(cells[i][j].isClicked()){
-                cells[i][j].empty = false;
-                cells[i][j].particleType = ParticleType::Water; 
+
+void Update() {
+    if (IsKeyPressed(KEY_ENTER)) {
+        isSand = !isSand;
+    }
+
+    for (int i = numR - 1; i >= 0; i--) {
+        for (int j = numC - 1; j >= 0; j--) {
+            cells[i][j].updated = false;
+            if (cells[i][j].isClicked()) {
+                cells[i][j].particleType = isSand ? SAND : WATER;
             }
-            cells[i][j].updated = !cells[i][j].updated;
-            if(!cells[i][j].empty){
-                unique_ptr<Particle> particle;
-                switch(cells[i][j].particleType){
-                    case ParticleType::Sand:
-                        particle = make_unique<SandParticle>();
-                        break;
-                    case ParticleType::Water:
-                        particle = make_unique<WaterParticle>();
-                        break;
-                    default:
-                        continue; 
-                }
-                particle->Update(cells, i, j);
+            
+            auto particle = getParticle(cells[i][j].particleType);
+            if (particle && !cells[i][j].updated) {
+                particle->update(cells, i, j);
             }
         }
     }
 }
-
