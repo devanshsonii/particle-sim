@@ -1,7 +1,6 @@
 # 2D Sandbox Simulation
 
-![Showcase](https://i.imgur.com/cQ6A2V3.mp4)
-
+![Showcase](https://github.com/devanshsonii/particle-sim/assets/139559687/bb709795-3e6e-4f3d-b651-bd53a817d1f4)
 
 ## Project Overview
 
